@@ -62,5 +62,8 @@ npm run dev
 
 ---
 
+<img width="1919" height="1024" alt="image" src="https://github.com/user-attachments/assets/8a666b82-fcf3-42fb-ba60-c6d5fe4e2664" />
+
+---
 ## 📜 License
 MIT License © 2025 [Beeresh Kumar](https://github.com/beereshbc)
