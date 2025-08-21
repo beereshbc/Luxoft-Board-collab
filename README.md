@@ -72,19 +72,20 @@ npm run dev\
 - ``` 
 - **Start backend only** → **_
 - ```
-- npm start
-- ```_** inside
--  ```
-- backend/
-- ``` 
+  npm start
+ ```
+_** inside
+ ```
+  backend/
+ ``` 
 - **Start frontend only** → **_
-- ```
-- npm start
-- ```
-- _** inside
-- ```
-- frontend/
-- ``` 
+```
+npm start
+ ```
+ inside
+ ```
+  frontend/
+ ``` 
 
 ---
 
