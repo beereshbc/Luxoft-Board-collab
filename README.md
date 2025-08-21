@@ -79,10 +79,8 @@ _** inside
   backend/
  ``` 
 - **Start frontend only** → **_
-```
-npm start
- ```
- inside
+```npm start
+ ```inside
  ```
   frontend/
  ``` 
