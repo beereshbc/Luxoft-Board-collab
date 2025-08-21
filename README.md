@@ -25,7 +25,7 @@ Luxoft-Board-collab/
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the repository
-```git clone git@github.com:beereshbc/Luxoft-Board-collab.git```
+``` git clone git@github.com:beereshbc/Luxoft-Board-collab.git ```
 
 ### 2️⃣ Install dependencies  
 Go inside both folders (`frontend` and `backend`) and install:
