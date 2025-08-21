@@ -7,8 +7,8 @@ A collaborative real-time board and chat application built with **MERN Stack + S
 ## 🚀 Features
 - Real-time chat with rooms
 - Collaborative whiteboard (Quill editor)
-- User list with avatars
 - Instant room joining
+- Real time texting
 - Persistent storage with MongoDB
 
 ---
@@ -16,8 +16,8 @@ A collaborative real-time board and chat application built with **MERN Stack + S
 ## 📂 Project Structure
 ```
 Luxoft-Board-collab/
-├── client/    # Frontend (React + TailwindCSS)
-├── server/    # Backend (Node.js + Express + MongoDB)
+├── frontend/    # Frontend (React + TailwindCSS)
+├── backend/    # Backend (Node.js + Express + MongoDB)
 ```
 
 ---
@@ -25,20 +25,15 @@ Luxoft-Board-collab/
 ## ⚙️ Installation & Setup
 
 ### 1️⃣ Clone the repository
-**_`git clone git@github.com:beereshbc/Luxoft-Board-collab.git`_**
+**_```git clone git@github.com:beereshbc/Luxoft-Board-collab.git```_**
 
 ### 2️⃣ Install dependencies  
-Go inside both folders (`client` and `server`) and install:
+Go inside both folders (`frontend` and `backend`) and install:
 
-**_`npm install`_**
+**_```npm install```_**
 
 ### 3️⃣ Run the project (both frontend & backend)
-**_`npm run dev`_**
-
-This runs:
-- React frontend on **http://localhost:3000/**
-- Node.js backend on **http://localhost:4000/** (or configured port)
-
+**_```npm run dev```_**
 ---
 
 ## 🛠️ Tech Stack
@@ -58,10 +53,10 @@ This runs:
 
 ## 💡 Commands Reference
 
-- **Install dependencies** → **_`npm install`_**  
-- **Run development server** → **_`npm run dev`_**  
-- **Start backend only** → **_`npm start`_** inside `server/`  
-- **Start frontend only** → **_`npm start`_** inside `client/`  
+- **Install dependencies** → **_```npm install```_**  
+- **Run development server** → **_```npm run dev```_**  
+- **Start backend only** → **_```npm start```_** inside ```backend/``` 
+- **Start frontend only** → **_```npm start```_** inside ```frontend/``` 
 
 ---
 
