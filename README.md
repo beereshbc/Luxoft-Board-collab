@@ -31,14 +31,18 @@ Luxoft-Board-collab/
 Go inside both folders (`frontend` and `backend`) and install:
 ```
 cd backend
+npm install
 ```
-```npm install```
 *for frontend
-```cd frontend```
-```npm install```
+```
+cd frontend
+npm install
+```
 
 ### 3️⃣ Run the project (both frontend & backend)
-```npm run dev```
+```
+npm run dev\
+```
 ---
 
 ## 🛠️ Tech Stack
@@ -58,10 +62,29 @@ cd backend
 
 ## 💡 Commands Reference
 
-- **Install dependencies** → **_```npm install```_**  
-- **Run development server** → **_```npm run dev```_**  
-- **Start backend only** → **_```npm start```_** inside ```backend/``` 
-- **Start frontend only** → **_```npm start```_** inside ```frontend/``` 
+- **Install dependencies** → 
+- ```
+   npm install
+- ``` 
+- **Run development server** →
+- ```
+  npm run dev
+- ``` 
+- **Start backend only** → **_
+- ```
+- npm start
+- ```_** inside
+-  ```
+- backend/
+- ``` 
+- **Start frontend only** → **_
+- ```
+- npm start
+- ```
+- _** inside
+- ```
+- frontend/
+- ``` 
 
 ---
 
