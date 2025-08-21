@@ -29,9 +29,11 @@ Luxoft-Board-collab/
 
 ### 2️⃣ Install dependencies  
 Go inside both folders (`frontend` and `backend`) and install:
-```cd backend```
+```
+cd backend
+```
 ```npm install```
-## for frontend
+*for frontend
 ```cd frontend```
 ```npm install```
 
