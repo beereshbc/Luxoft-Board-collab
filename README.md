@@ -36,12 +36,12 @@ npm install
 *for frontend
 ```
 cd frontend
-npm install
+npm install -f
 ```
 
 ### 3️⃣ Run the project (both frontend & backend)
 ```
-npm run dev\
+npm run dev
 ```
 ---
 
@@ -57,33 +57,6 @@ npm run dev\
 2. Join the room and collaborate in **real-time**.  
 3. Open `/users` to see the **active user list** instantly.  
 4. Chat + Whiteboard sync live.  
-
----
-
-## 💡 Commands Reference
-
-- **Install dependencies** → 
-- ```
-   npm install
-- ``` 
-- **Run development server** →
-- ```
-  npm run dev
-- ``` 
-- **Start backend only** → **_
-- ```
-  npm start
- ```
-_** inside
- ```
-  backend/
- ``` 
-- **Start frontend only** → **_
-```npm start
- ```inside
- ```
-  frontend/
- ``` 
 
 ---
 
