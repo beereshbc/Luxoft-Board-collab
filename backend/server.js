@@ -14,7 +14,7 @@ await connectDB();
 
 const io = new Server(4001, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URI,
     methods: ["GET", "POST"],
   },
 });
