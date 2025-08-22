@@ -14,8 +14,7 @@ await connectDB();
 
 const io = new Server(4001, {
   cors: {
-    origin: "http://localhost:5173",
-    origin: "https://luxoft-board-collab.vercel.app",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
