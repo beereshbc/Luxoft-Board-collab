@@ -41,12 +41,9 @@ export default function ChatBox() {
   };
 
   return (
-    <div className="flex flex-col h-screen sm:mx-28 mx-6 bg-gray-900 relative">
+    <div className="flex flex-col h-screen sm:mx-28 mx-6 bg-gray-900 relative ">
       {/* Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-20 blur-sm pointer-events-none"
-        style={{ backgroundImage: "url('/board.png')" }}
-      />
+      <div className="absolute inset-0 bg-cover bg-center opacity-20 blur-sm pointer-events-none" />
 
       {/* Messages */}
       <div className="flex-1 flex flex-col overflow-y-auto px-4 py-6">
@@ -75,7 +72,7 @@ export default function ChatBox() {
       </div>
 
       {/* Input */}
-      <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900  px-4 py-3 flex items-center gap-3 mb-20">
         <input
           type="text"
           value={msg}
