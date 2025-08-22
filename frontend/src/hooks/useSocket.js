@@ -7,13 +7,17 @@ export default function useSocket(roomId) {
 
   useEffect(() => {
     // Connect to backend
-    socketRef.current = io("https://luxoft-board-collab-db6p.vercel.app/", {
-      transports: ["websocket"],
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
+    socketRef.current = io(
+      import.meta.env.VITE_SERVER_URL ||
+        "https://luxoft-board-collab-gmit.onrender.com",
+      {
+        transports: ["websocket"],
+        autoConnect: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      }
+    );
 
     socketRef.current.on("connect", () => {
       console.log("✅ Connected:", socketRef.current.id);
