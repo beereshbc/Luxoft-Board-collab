@@ -1,5 +1,4 @@
-//-------------------------------------------------------------------
-
+import "dotenv/config";
 import { Server } from "socket.io";
 import connectDB from "./config/mongoDB.js";
 import express from "express";
@@ -10,6 +9,7 @@ import ChatModel from "./models/ChatModel.js";
 const app = express();
 app.use(express.json());
 
+// ✅ connect DB
 await connectDB();
 
 const io = new Server(4001, {
@@ -19,15 +19,13 @@ const io = new Server(4001, {
   },
 });
 
-// ---------------- Document Editor (Quill) ----------------
 const defaultDocValue = "";
-
-const onlineUsers = {};
+const onlineUsers = {}; // { roomId: [ { username, usn } ] }
 
 io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
+  console.log("✅ Client connected:", socket.id);
 
-  // ------ DOC: join + load ------
+  // ---------------- Document ----------------
   socket.on("get-room", async (roomId) => {
     const document = await findOrCreateDocument(roomId);
     socket.join(roomId);
@@ -89,11 +87,10 @@ io.on("connection", (socket) => {
       }
     });
 
-    // Clear the entire board
-    socket.on("clear-board", async (roomId) => {
+    socket.on("clear-board", async () => {
       try {
         await WhiteboardModel.findByIdAndUpdate(roomId, { strokes: [] });
-        io.to(roomId).emit("clear-board"); // broadcast to everyone
+        io.to(roomId).emit("clear-board");
       } catch (err) {
         console.error("BOARD clear error:", err.message);
       }
@@ -103,132 +100,67 @@ io.on("connection", (socket) => {
   // ---------------- Chat ----------------
   socket.on("get-chat", async (roomId) => {
     let chat = await ChatModel.findOne({ roomId });
-    if (!chat) {
-      chat = await ChatModel.create({ roomId, messages: [] });
-    }
+    if (!chat) chat = await ChatModel.create({ roomId, messages: [] });
 
     socket.join(`chat-${roomId}`);
     socket.emit("load-chat", chat.messages);
-
-    socket.on("send-chat", async (msg) => {
-      if (!msg.text.trim()) return;
-
-      const newMsg = { user: msg.user, text: msg.text, ts: new Date() };
-      chat.messages.push(newMsg);
-      await chat.save();
-
-      socket.to(`chat-${roomId}`).emit("receive-chat", newMsg);
-      socket.emit("receive-chat", newMsg); // emit to sender immediately
-    });
   });
-  //------------------users per room --------------
+
+  socket.on("send-chat", async ({ roomId, user, text }) => {
+    if (!text.trim()) return;
+
+    const newMsg = { user, text, ts: new Date() };
+
+    await ChatModel.findOneAndUpdate(
+      { roomId },
+      { $push: { messages: newMsg } },
+      { upsert: true, new: true }
+    );
+
+    io.to(`chat-${roomId}`).emit("receive-chat", newMsg);
+  });
+
+  // ---------------- Users ----------------
   socket.on("join-room", ({ roomId, usn, username }) => {
     socket.join(roomId);
+    socket.data = { roomId, usn }; // ✅ track who is inside
 
-    // Add user to online list
     if (!onlineUsers[roomId]) onlineUsers[roomId] = [];
-
-    // Prevent duplicates
     if (!onlineUsers[roomId].some((u) => u.usn === usn)) {
       onlineUsers[roomId].push({ usn, username });
     }
 
-    // Broadcast updated list
     io.to(roomId).emit("update-users", onlineUsers[roomId]);
   });
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
 
-    const { username, roomId } = socket.data;
-    if (username && roomId && onlineUsers[roomId]) {
-      onlineUsers[roomId] = onlineUsers[roomId].filter(
-        (user) => user !== username
-      );
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected:", socket.id);
+    const { roomId, usn } = socket.data || {};
+    if (roomId && usn && onlineUsers[roomId]) {
+      onlineUsers[roomId] = onlineUsers[roomId].filter((u) => u.usn !== usn);
       io.to(roomId).emit("update-users", onlineUsers[roomId]);
     }
   });
 });
 
+// ---------------- Helpers ----------------
 const findOrCreateDocument = async (id) => {
   if (!id) return null;
   const document = await DocumentModel.findById(id);
-  if (document) return document;
-  return await DocumentModel.create({ _id: id, data: defaultDocValue });
+  return (
+    document || (await DocumentModel.create({ _id: id, data: defaultDocValue }))
+  );
 };
 
 const findOrCreateBoard = async (id) => {
   if (!id) return null;
   const board = await WhiteboardModel.findById(id);
-  if (board) return board;
-  return await WhiteboardModel.create({ _id: id, strokes: [] });
+  return board || (await WhiteboardModel.create({ _id: id, strokes: [] }));
 };
 
-// ---------------- Minimal HTTP ----------------
+// ---------------- HTTP ----------------
 app.get("/", (req, res) => {
   res.send("Luxoft API is working....");
 });
 
-const PORT = 4000;
-app.listen(PORT, () => {
-  console.log(`HTTP server running on port ${PORT}`);
-});
-
-//-------------------------------------------------------------------
-
-// import { Server } from "socket.io";
-// import connectDB from "./config/mongoDB.js";
-// import express from "express";
-// import DocumentModel from "./models/DocumentModel.js";
-
-// const app = express();
-
-// app.use(express.json());
-
-// await connectDB();
-
-// const io = new Server(4001, {
-//   cors: {
-//     origin: "http://localhost:5173",
-//     methods: ["GET", "POST"],
-//   },
-// });
-
-// const defaultValue = "";
-
-// io.on("connection", (socket) => {
-//   console.log("Client Connect Agide: ", socket.id);
-
-//   socket.on("get-room", async (roomId) => {
-//     const document = await findOrCreateDocument(roomId);
-//     socket.join(roomId);
-//     socket.emit("load-room", document.data);
-//     socket.on("send-changes", (delta) => {
-//       socket.broadcast.to(roomId).emit("receive-changes", delta);
-//     });
-
-//     socket.on("save-document", async (data) => {
-//       await DocumentModel.findByIdAndUpdate(roomId, { data });
-//     });
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Client Disconnect agidane: ", socket.id);
-//   });
-// });
-
-// const findOrCreateDocument = async (id) => {
-//   if (id == null) return;
-//   const document = await DocumentModel.findById(id);
-//   if (document) return document;
-//   return await DocumentModel.create({ _id: id, data: defaultValue });
-// };
-
-// app.get("/", (req, res) => {
-//   res.send("Luxoft API is working....");
-// });
-
-// const PORT = 4000;
-
-// app.listen(PORT, () => {
-//   console.log(`Server is Running on port ${PORT}`);
-// });
+app.listen(4000, () => console.log("HTTP server on 4000"));

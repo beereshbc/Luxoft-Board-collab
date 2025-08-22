@@ -7,59 +7,46 @@ import Sidebar from "./Sidebar";
 const socket = io("http://localhost:4001", { transports: ["websocket"] });
 
 export default function ChatBox() {
-  const { roomId, name } = useParams(); // ✅ matches /room/:roomId/chat/:name
-  const username = name || localStorage.getItem("username") || "Me";
-
-  const { addUser, removeUser, users } = useRoom();
+  const { roomId } = useParams();
+  const { user } = useRoom();
+  const username = user || localStorage.getItem("username") || "Me";
 
   const [msg, setMsg] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
 
-  const { setUserList } = useRoom();
-
   useEffect(() => {
     if (!roomId || !username) return;
 
-    localStorage.setItem("roomId", roomId);
-    localStorage.setItem("username", username);
-
-    // ✅ Always rejoin on mount or refresh
-    socket.emit("join-room", { roomId, username });
+    socket.emit("join-room", { roomId, username, usn: username });
     socket.emit("get-chat", roomId);
-
-    socket.on("update-users", (userList) => {
-      setUserList(userList); // ✅ always overwrite
-    });
 
     socket.on("load-chat", (msgs) => setMessages(msgs));
     socket.on("receive-chat", (m) => setMessages((prev) => [...prev, m]));
 
     return () => {
-      socket.off("update-users");
       socket.off("load-chat");
       socket.off("receive-chat");
     };
-  }, []);
+  }, [roomId, username]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMsg = () => {
     if (!msg.trim()) return;
-    socket.emit("send-chat", { user: username, text: msg });
+    socket.emit("send-chat", { roomId, user: username, text: msg });
     setMsg("");
   };
 
   return (
     <div className="flex flex-col h-screen sm:mx-28 mx-6 bg-gray-900 relative">
+      {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-20 blur-sm pointer-events-none"
         style={{ backgroundImage: "url('/board.png')" }}
-      ></div>
+      />
 
       {/* Messages */}
       <div className="flex-1 flex flex-col overflow-y-auto px-4 py-6">
@@ -88,7 +75,7 @@ export default function ChatBox() {
       </div>
 
       {/* Input */}
-      <div className="fixed bottom-0 left-0 w-full bg-gray-900 backdrop-blur-sm border-t border-gray-200 px-4 py-3 flex items-center gap-3">
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-200 px-4 py-3 flex items-center gap-3">
         <input
           type="text"
           value={msg}
@@ -104,6 +91,7 @@ export default function ChatBox() {
           Send
         </button>
       </div>
+
       <Sidebar />
     </div>
   );

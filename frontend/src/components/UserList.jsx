@@ -7,30 +7,27 @@ import Sidebar from "./Sidebar";
 export default function UserList() {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const { user, usn } = useRoom(); // ✅ from context
+  const { user, usn } = useRoom();
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const socket = io("http://localhost:4001", { transports: ["websocket"] });
 
-    // ✅ send both separately
     socket.emit("join-room", {
       roomId,
-      usn,
-      username: user, // useRoom gives `user` = username
+      usn: usn || user,
+      username: user,
     });
 
     socket.on("update-users", (usersInRoom) => {
       setUsers(usersInRoom);
     });
 
-    return () => {
-      socket.disconnect();
-    };
+    return () => socket.disconnect();
   }, [roomId, user, usn]);
+
   return (
     <div className="flex flex-col h-screen bg-gray-900 p-6 mx-2 sm:mx-44">
-      {/* Page Header */}
       <div className="mb-6 text-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">
           Online Users
@@ -40,12 +37,11 @@ export default function UserList() {
         </p>
       </div>
 
-      {/* Users Grid */}
       <div className="flex-1 overflow-y-auto">
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-          {users.map((u) => (
+          {users.map((u, i) => (
             <div
-              key={u}
+              key={i}
               className="p-4 h-28 bg-white rounded-xl shadow-md hover:shadow-lg transition-all flex flex-col items-center justify-center text-center"
             >
               <p className="font-semibold text-gray-800 text-lg">
@@ -57,7 +53,6 @@ export default function UserList() {
         </div>
       </div>
 
-      {/* Back Button */}
       <div className="mt-4 flex justify-center">
         <button
           onClick={() => navigate(-1)}
