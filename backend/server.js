@@ -2,7 +2,7 @@ import "dotenv/config";
 import { Server } from "socket.io";
 import express from "express";
 import serverless from "serverless-http";
-import connectDB from "./config/mongoDB";
+import connectDB from "./config/mongoDB.js";
 import ChatModel from "./models/ChatModel";
 import WhiteboardModel from "./models/WhiteboardModel";
 import DocumentModel from "./models/DocumentModel";
