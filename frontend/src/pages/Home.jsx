@@ -36,7 +36,7 @@ export default function Home() {
         {/* Board Image */}
         <div>
           <img
-            src="/public/board.png"
+            src="/board.png"
             alt="Board"
             className="max-w-xl rounded-2xl  border border-gray-200"
           />
