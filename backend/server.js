@@ -3,9 +3,9 @@ import { Server } from "socket.io";
 import express from "express";
 import serverless from "serverless-http";
 import connectDB from "./config/mongoDB.js";
-import ChatModel from "./models/ChatModel";
-import WhiteboardModel from "./models/WhiteboardModel";
-import DocumentModel from "./models/DocumentModel";
+import ChatModel from "./models/ChatModel.js";
+import WhiteboardModel from "./models/WhiteboardModel.js";
+import DocumentModel from "./models/DocumentModel.js";
 
 const app = express();
 app.use(express.json());
