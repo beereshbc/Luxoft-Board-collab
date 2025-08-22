@@ -1,11 +1,11 @@
 import "dotenv/config";
 import { Server } from "socket.io";
-import connectDB from "../config/mongoDB.js";
 import express from "express";
-import DocumentModel from "../models/DocumentModel.js";
-import WhiteboardModel from "../models/WhiteboardModel.js";
-import ChatModel from "../models/ChatModel.js";
 import serverless from "serverless-http";
+import connectDB from "./config/mongoDB";
+import ChatModel from "./models/ChatModel";
+import WhiteboardModel from "./models/WhiteboardModel";
+import DocumentModel from "./models/DocumentModel";
 
 const app = express();
 app.use(express.json());
