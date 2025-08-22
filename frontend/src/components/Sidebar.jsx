@@ -1,11 +1,20 @@
-import React from "react";
-import { FileText, MessageCircle, Users, Home } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import {
+  FileText,
+  MessageCircle,
+  Users,
+  Home,
+  Menu,
+  ArrowLeft,
+} from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useRoom } from "../context/RoomContext";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { roomId, usn } = useRoom();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const menuItems = [
     { name: "White Board", icon: Home, path: `/room/${roomId}` },
@@ -40,7 +49,6 @@ const Sidebar = () => {
               >
                 <Icon size={22} />
               </Link>
-              {/* Tooltip (hover only desktop) */}
               <div className="absolute right-full top-1/2 -translate-y-1/2 mr-2 text-sm bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
                 {item.name}
               </div>
@@ -49,25 +57,56 @@ const Sidebar = () => {
         })}
       </div>
 
-      {/* Mobile Bottom Navbar */}
-      <div className="sm:hidden fixed bottom-0 left-0 w-full bg-gray-900 border-t border-gray-700 flex justify-around py-2 z-50">
-        {menuItems.map((item, index) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+      {/* Mobile Buttons: Back, Home, Hamburger */}
+      <div className="sm:hidden fixed bottom-4 right-4 z-50 flex space-x-3">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-gray-900 text-yellow-500 p-3 rounded-full shadow-lg flex items-center justify-center"
+        >
+          <ArrowLeft size={24} />
+        </button>
 
-          return (
-            <Link
-              key={index}
-              to={item.path}
-              className={`flex flex-col items-center justify-center text-yellow-500 ${
-                isActive ? "text-yellow-300" : "text-yellow-500"
-              }`}
-            >
-              <Icon size={22} />
-              <span className="text-xs mt-1">{item.name}</span>
-            </Link>
-          );
-        })}
+        {/* Home Button */}
+        <Link
+          to="/"
+          className="bg-gray-900 text-yellow-500 p-3 rounded-full shadow-lg flex items-center justify-center"
+        >
+          <Home size={24} />
+        </Link>
+
+        {/* Hamburger Menu */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="bg-gray-900 text-yellow-500 p-3 rounded-full shadow-lg"
+        >
+          <Menu size={24} />
+        </button>
+
+        {/* Slide-up menu */}
+        {menuOpen && (
+          <div className="fixed bottom-16 right-4 bg-gray-900 rounded-lg shadow-lg py-4 px-3 flex flex-col space-y-3 z-50">
+            {menuItems.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={index}
+                  to={item.path}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                    isActive
+                      ? "bg-yellow-500 text-white"
+                      : "text-yellow-500 hover:bg-gray-800"
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Icon size={20} />
+                  <span className="text-sm">{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );
