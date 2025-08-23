@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useRoom } from "../context/RoomContext";
 import Sidebar from "./Sidebar";
 
-const socket = io("https://luxoft-board-collab-4-gmit.onrender.com", {
+const socket = io("https://luxoft-board-collab.vercel.app", {
   transports: ["websocket"],
 });
 

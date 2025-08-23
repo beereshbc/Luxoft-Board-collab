@@ -28,7 +28,7 @@ const DocumentEditor = () => {
   ];
 
   useEffect(() => {
-    const s = io("https://luxoft-board-collab-4-gmit.onrender.com");
+    const s = io("https://luxoft-board-collab.vercel.app");
     setSocket(s);
     return () => {
       s.disconnect();

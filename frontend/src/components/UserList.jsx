@@ -11,7 +11,7 @@ export default function UserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const socket = io("https://luxoft-board-collab-4-gmit.onrender.com", {
+    const socket = io("https://luxoft-board-collab.vercel.app", {
       transports: ["websocket"],
     });
 
