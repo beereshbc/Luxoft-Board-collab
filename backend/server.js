@@ -1,8 +1,7 @@
 import "dotenv/config";
-import express from "express";
-import http from "http"; // Needed to combine HTTP + Socket.IO
 import { Server } from "socket.io";
 import connectDB from "./config/mongoDB.js";
+import express from "express";
 import DocumentModel from "./models/DocumentModel.js";
 import WhiteboardModel from "./models/WhiteboardModel.js";
 import ChatModel from "./models/ChatModel.js";
@@ -13,13 +12,10 @@ app.use(express.json());
 // ✅ connect DB
 await connectDB();
 
-// Create HTTP server
-const server = http.createServer(app);
-
-// Socket.IO on same server
-const io = new Server(server, {
+const io = new Server(4001, {
   cors: {
-    origin: "https://luxoft-board-collab.vercel.app", // For testing, replace with frontend URL in production
+    origin: "http://localhost:5173",
+    origin: "https://luxoft-board-collab.vercel.app",
     methods: ["GET", "POST"],
   },
 });
@@ -27,7 +23,6 @@ const io = new Server(server, {
 const defaultDocValue = "";
 const onlineUsers = {}; // { roomId: [ { username, usn } ] }
 
-// ---------------- Socket.IO ----------------
 io.on("connection", (socket) => {
   console.log("✅ Client connected:", socket.id);
 
@@ -129,7 +124,7 @@ io.on("connection", (socket) => {
   // ---------------- Users ----------------
   socket.on("join-room", ({ roomId, usn, username }) => {
     socket.join(roomId);
-    socket.data = { roomId, usn };
+    socket.data = { roomId, usn }; // ✅ track who is inside
 
     if (!onlineUsers[roomId]) onlineUsers[roomId] = [];
     if (!onlineUsers[roomId].some((u) => u.usn === usn)) {
@@ -169,6 +164,4 @@ app.get("/", (req, res) => {
   res.send("Luxoft API is working....");
 });
 
-// Use env PORT for hosting
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(4000, () => console.log("HTTP server on 4000"));
