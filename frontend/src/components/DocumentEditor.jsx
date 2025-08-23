@@ -28,7 +28,7 @@ const DocumentEditor = () => {
   ];
 
   useEffect(() => {
-    const s = io("https://luxoft-board-collab.vercel.app");
+    const s = io("http://localhost:4001");
     setSocket(s);
     return () => {
       s.disconnect();

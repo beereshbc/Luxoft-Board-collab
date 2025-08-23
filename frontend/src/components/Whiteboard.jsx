@@ -169,7 +169,7 @@ const Whiteboard = () => {
 
   // -------- Socket Setup --------
   useEffect(() => {
-    const s = io("https://luxoft-board-collab.vercel.app", {
+    const s = io("http://localhost:4001", {
       transports: ["websocket"],
     });
     setSocket(s);

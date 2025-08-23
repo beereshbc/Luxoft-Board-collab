@@ -11,7 +11,7 @@ export default function UserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const socket = io("https://luxoft-board-collab.vercel.app", {
+    const socket = io("http://localhost:4001", {
       transports: ["websocket"],
     });
 
