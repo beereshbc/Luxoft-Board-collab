@@ -5,17 +5,21 @@ import express from "express";
 import DocumentModel from "./models/DocumentModel.js";
 import WhiteboardModel from "./models/WhiteboardModel.js";
 import ChatModel from "./models/ChatModel.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // ✅ connect DB
 await connectDB();
 
 const io = new Server(4001, {
   cors: {
-    origin: "http://localhost:5173",
-    origin: "https://luxoft-board-collab.vercel.app",
+    origin: [
+      "http://localhost:5173", // for local dev
+      "https://luxoft-board-collab.vercel.app", // for production frontend
+    ],
     methods: ["GET", "POST"],
   },
 });
