@@ -24,7 +24,7 @@ const Whiteboard = () => {
   const [isDrawing, setIsDrawing] = useState(false);
 
   const [tool, setTool] = useState("pen");
-  const [color, setColor] = useState("#1f2937"); // Premium gray
+  const [color, setColor] = useState("#1f2937");
   const [width, setWidth] = useState(3);
 
   const [zoom, setZoom] = useState(1);
@@ -45,6 +45,47 @@ const Whiteboard = () => {
     ctx.restore();
   }, []);
 
+  // Shape recognition
+  const recognizeShape = (points) => {
+    if (points.length < 5) return null;
+
+    // Line detection
+    const dx = points[points.length - 1].x - points[0].x;
+    const dy = points[points.length - 1].y - points[0].y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const pathLength = points.reduce((acc, p, i) => {
+      if (i === 0) return 0;
+      const dx = p.x - points[i - 1].x;
+      const dy = p.y - points[i - 1].y;
+      return acc + Math.sqrt(dx * dx + dy * dy);
+    }, 0);
+
+    if (Math.abs(pathLength - distance) / distance < 0.1) return "line";
+
+    // Circle detection (rough)
+    const centerX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+    const centerY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+    const radiusAvg =
+      points.reduce(
+        (sum, p) =>
+          sum + Math.sqrt((p.x - centerX) ** 2 + (p.y - centerY) ** 2),
+        0
+      ) / points.length;
+    const variance =
+      points.reduce(
+        (sum, p) =>
+          sum +
+          Math.abs(
+            Math.sqrt((p.x - centerX) ** 2 + (p.y - centerY) ** 2) - radiusAvg
+          ),
+        0
+      ) / points.length;
+    if (variance < 5) return "circle";
+
+    return null;
+  };
+
   const drawStroke = useCallback(
     (ctx, stroke) => {
       if (!stroke || stroke.points.length < 2) return;
@@ -63,6 +104,38 @@ const Whiteboard = () => {
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
 
+      // Draw recognized shape
+      if (stroke.shape === "line") {
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        ctx.lineTo(
+          stroke.points[stroke.points.length - 1].x,
+          stroke.points[stroke.points.length - 1].y
+        );
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      if (stroke.shape === "circle") {
+        const centerX =
+          stroke.points.reduce((sum, p) => sum + p.x, 0) / stroke.points.length;
+        const centerY =
+          stroke.points.reduce((sum, p) => sum + p.y, 0) / stroke.points.length;
+        const radius =
+          stroke.points.reduce(
+            (sum, p) =>
+              sum + Math.sqrt((p.x - centerX) ** 2 + (p.y - centerY) ** 2),
+            0
+          ) / stroke.points.length;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      // Freehand drawing
       ctx.beginPath();
       ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
       for (let i = 1; i < stroke.points.length - 1; i++) {
@@ -96,7 +169,9 @@ const Whiteboard = () => {
 
   // -------- Socket Setup --------
   useEffect(() => {
-    const s = io("http://localhost:4001", { transports: ["websocket"] });
+    const s = io("https://luxoft-board-collab-4-gmit.onrender.com", {
+      transports: ["websocket"],
+    });
     setSocket(s);
     return () => s.disconnect();
   }, []);
@@ -214,12 +289,27 @@ const Whiteboard = () => {
     }
     if (!isDrawing || !currentStrokeRef.current) return;
     setIsDrawing(false);
-    const stroke = currentStrokeRef.current;
+
+    let stroke = currentStrokeRef.current;
     currentStrokeRef.current = null;
+
+    // Apply shape recognition
+    const shape = recognizeShape(stroke.points);
+    if (shape) {
+      stroke.shape = shape;
+      toast(`${shape.charAt(0).toUpperCase() + shape.slice(1)} recognized!`);
+      if (shape === "line") {
+        stroke.points = [
+          stroke.points[0],
+          stroke.points[stroke.points.length - 1],
+        ];
+      }
+    }
 
     historyRef.current = [...historyRef.current, stroke];
     setStrokes((prev) => [...prev, stroke]);
     if (socket) socket.emit("send-stroke", stroke);
+    redrawAll();
   };
 
   // -------- Toolbar Actions --------
@@ -252,22 +342,20 @@ const Whiteboard = () => {
 
   return (
     <div className="flex-1 relative h-full overflow-auto bg-gray-900">
-      {/* Background Image with blur */}
+      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-20 blur-sm"
         style={{ backgroundImage: "url('/public/board.png')" }}
       ></div>
 
-      {/* Main Content */}
       <div className="relative z-10 p-6 sm:p-10 w-full max-w-7xl mx-auto">
         <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 text-center sm:text-left">
             Luxoft Whiteboard
           </h1>
 
-          {/* Tools and Actions */}
+          {/* Tools */}
           <div className="flex flex-col sm:flex-wrap sm:flex-row items-center gap-3 mb-4 justify-between">
-            {/* Tools */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-gray-600 text-sm font-medium">Tools:</span>
               <button
@@ -305,7 +393,6 @@ const Whiteboard = () => {
               </button>
             </div>
 
-            {/* Stroke */}
             <div className="flex items-center gap-2 flex-wrap mt-2 sm:mt-0">
               <span className="text-gray-600 text-sm font-medium">Stroke:</span>
               <input
@@ -325,7 +412,6 @@ const Whiteboard = () => {
               />
             </div>
 
-            {/* Actions */}
             <div className="flex items-center gap-2 flex-wrap mt-2 sm:mt-0">
               <span className="text-gray-600 text-sm font-medium">
                 Actions:
@@ -389,18 +475,3 @@ const Whiteboard = () => {
 };
 
 export default Whiteboard;
-
-// import React from "react";
-// import { Excalidraw } from "@excalidraw/excalidraw";
-// import "@excalidraw/excalidraw/index.css"; // ✅ this is the correct CSS file
-// // (not dist/excalidraw.min.css — that’s why your earlier attempt failed)
-
-// const Whiteboard = () => {
-//   return (
-//     <div style={{ height: "100vh", width: "100%" }}>
-//       <Excalidraw />
-//     </div>
-//   );
-// };
-
-// export default Whiteboard;

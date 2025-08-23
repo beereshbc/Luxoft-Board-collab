@@ -11,7 +11,9 @@ export default function UserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const socket = io("http://localhost:4001", { transports: ["websocket"] });
+    const socket = io("https://luxoft-board-collab-4-gmit.onrender.com", {
+      transports: ["websocket"],
+    });
 
     socket.emit("join-room", {
       roomId,

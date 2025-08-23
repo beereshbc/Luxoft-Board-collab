@@ -28,7 +28,7 @@ const DocumentEditor = () => {
   ];
 
   useEffect(() => {
-    const s = io("http://localhost:4001");
+    const s = io("https://luxoft-board-collab-4-gmit.onrender.com");
     setSocket(s);
     return () => {
       s.disconnect();
