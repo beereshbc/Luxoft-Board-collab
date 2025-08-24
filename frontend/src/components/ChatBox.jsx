@@ -4,8 +4,9 @@ import { useParams } from "react-router-dom";
 import { useRoom } from "../context/RoomContext";
 import Sidebar from "./Sidebar";
 
-const socket = io("http://localhost:4001", {
+const socket = io("https://luxoft-board-collab-gmit.onrender.com", {
   transports: ["websocket"],
+  withCredentials: true,
 });
 
 export default function ChatBox() {

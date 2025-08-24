@@ -169,7 +169,7 @@ const Whiteboard = () => {
 
   // -------- Socket Setup --------
   useEffect(() => {
-    const s = io("http://localhost:4001", {
+    const s = io("https://luxoft-board-collab-gmit.onrender.com", {
       transports: ["websocket"],
     });
     setSocket(s);

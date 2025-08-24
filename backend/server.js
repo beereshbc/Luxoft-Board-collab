@@ -6,6 +6,7 @@ import DocumentModel from "./models/DocumentModel.js";
 import WhiteboardModel from "./models/WhiteboardModel.js";
 import ChatModel from "./models/ChatModel.js";
 import cors from "cors";
+import http from "http";
 
 const app = express();
 app.use(express.json());
@@ -14,10 +15,11 @@ app.use(cors());
 // ✅ connect DB
 await connectDB();
 
-const io = new Server(4001, {
+const server = http.createServer(app);
+const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:5173", // for local dev
+      // for local dev
       "https://luxoft-board-collab.vercel.app", // for production frontend
     ],
     methods: ["GET", "POST"],
@@ -167,5 +169,8 @@ const findOrCreateBoard = async (id) => {
 app.get("/", (req, res) => {
   res.send("Luxoft API is working....");
 });
-
-app.listen(4000, () => console.log("HTTP server on 4000"));
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+app.listen(PORT, () => console.log("HTTP server on 4000"));
